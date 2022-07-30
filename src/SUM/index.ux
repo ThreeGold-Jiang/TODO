@@ -1,0 +1,118 @@
+<template>
+    <div class="content">
+        <canvas class="new-canvas" id="new-canvas"></canvas>
+    </div>
+  </template>
+  
+  <style>
+    .content {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .new-canvas {
+        height: 750px;
+        width: 750px;
+    }
+  </style>
+  
+  <script>
+    export default {
+      private: {
+        drawComplete: false
+      },
+      protected:{
+        list:''
+      },
+      onInit() {
+        this.$page.setTitleBar({
+          text: '统计'
+        })
+      },
+      onShow() {
+        if (!this.drawComplete) {
+          this.drawCanvas()
+        }
+      },
+      drawCanvas() {
+        const canvas = this.$element('new-canvas') //获取 canvas 组件
+        const ctx = canvas.getContext('2d') //获取 canvas 绘图上下文
+        
+        ctx.font='48px serif'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'top'
+        ctx.fillText('统计', 50, 50)
+        //绘制横纵坐标
+        ctx.moveTo(150, 100)
+        ctx.font='40px serif'
+        ctx.fillText('^', 138.5, 91)
+        ctx.font='32px serif'
+        ctx.fillText('>', 685, 680)
+        ctx.lineTo(150, 700)
+        ctx.lineTo(700, 700)
+        ctx.stroke()
+        ctx.font='24px serif'
+        //绘制水平线
+
+        //绘制水平轴底部线段
+
+        ctx.font='32px serif'
+        //底部文字
+        ctx.fillText('TODO', 200, 715)
+
+        //底部文字
+        ctx.fillText('DOING', 400, 715)
+        
+
+        //底部文字
+        ctx.fillText('DONE', 600, 715)
+        ctx.stroke()
+        //绘制柱状图
+        ctx.fillStyle = "red"
+        this.list = JSON.parse(this.list)
+        ctx.fillRect(220, 700-40*this.list[0].list.length, 50, 40*this.list[0].list.length)
+        ctx.fillStyle = "black"
+        ctx.fillText(this.list[0].list.length, 235, 700-40*(this.list[0].list.length+1))
+        ctx.fillStyle = "red"
+        ctx.fillRect(420, 700-40*this.list[1].list.length, 50, 40*this.list[1].list.length)
+        ctx.fillStyle = "black"
+        ctx.fillText(this.list[1].list.length, 435, 700-40*(this.list[1].list.length+1))
+        ctx.fillStyle = "red"
+        ctx.fillRect(620, 700-40*this.list[2].list.length, 50, 40*this.list[2].list.length)
+        ctx.fillStyle = "black"
+        ctx.fillText(this.list[2].list.length, 635, 700-40*(this.list[2].list.length+1))        
+       },
+      drawCanvas2 () {
+         const canvas = this.$element('new-canvas2')
+        const ctx = canvas.getContext('2d')
+        const r = 20
+        const h = 380
+        const p = Math.PI
+        ctx.beginPath()
+        ctx.moveTo(r * 2, r)
+        ctx.arc(r * 2, r * 2, r, -p / 2, -p, true)
+        ctx.lineTo(r, h - r * 2)
+        ctx.arc(r * 2, h - r * 2, r, p, p / 2, true)
+        ctx.lineTo(h - r * 2, h - r)
+        ctx.arc(h - r * 2, h - r * 2, r, p / 2, 0, true)
+        ctx.lineTo(h - r, r * 2)
+        ctx.arc(h - r * 2, r * 2, r, 0, -p / 2, true)
+        ctx.closePath()
+        ctx.stroke()
+        const s = 60
+
+        ctx.beginPath()
+        ctx.moveTo(h / 2 + s, h / 2)
+        ctx.arc(h / 2, h / 2, s, 0, -p / 2 * 3, true)
+        ctx.arc(h / 2, h / 2 + s + s / 2, s / 2, -p / 2, p / 2, false)
+        ctx.arc(h / 2, h / 2, s * 2, -p / 2 * 3, 0, false)
+        ctx.arc(h / 2 + s + s / 2, h / 2, s / 2, 0, p, false)
+        ctx.moveTo(h / 2 + s * 2, h / 2 + s + s / 2)
+        ctx.arc(h / 2 + s + s / 2, h / 2 + s + s / 2, s / 2, 0, p * 2, false)
+        ctx.moveTo(h / 2 + s / 4 * 3, h / 2 + s / 2)
+        ctx.arc(h / 2 + s / 2, h / 2 + s / 2, s / 4, 0, p * 2, false)
+        ctx.fill()
+}
+    }
+  </script>
+   

@@ -1,0 +1,27 @@
+<template>
+  <div>
+      <text>welcome</text>
+  </div>
+</template>
+
+<style>
+
+</style>
+
+<script>
+  export default{
+      protected:{
+          pagename: "编辑",
+          name : '',
+          start :"",
+          end:"",
+          type:"",
+          idx: ""
+      },
+      onInit(){
+          this.$page.setTitleBar({text: this.pagename})
+
+      }
+  }
+
+</script>

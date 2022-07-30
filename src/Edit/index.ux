@@ -1,0 +1,298 @@
+<template>
+    <div class="edit-page">
+        <div class="input">
+            <div class="name">
+                <text class="title">{{titlename}}</text>
+                <input class="titleinput" type="text" placeholder="事项名称" value="{{name}}" onchange="changeName"></input>
+            </div>
+            <div class="select">
+                <text class="title">选择事件类型</text>             
+                <select class="selectinput" onchange="selectType">
+                    <option selected="{{type==0}}" value="0"> todo </option>
+                    <option selected="{{type==1}}" value="1"> doing </option>
+                    <option selected="{{type==2}}" value="2"> done </option>
+                </select>
+            </div>
+            <div class="time">
+                <text class="title">预计完成时间</text>
+                <picker class="date" type="date" value="{{date}}"  onchange="UpdateDate"></picker>
+                <picker class="concerettime" type="time" value="{{time}}"  onchange="UpdateTime"></picker>
+            </div>
+            <div class="Asr">
+                <div onclick="nameAsr">
+                    <text class="title">语音输入</text>
+                    <image style="width:100px;height: 100px" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.ibaotu.com%2F01%2F44%2F38%2F03p888piCZ3i.jpg-2.jpg%21ww700&refer=http%3A%2F%2Fpic.ibaotu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1660403037&t=7cf3a93046494dfa56c425ece1c42102"></image>
+                </div>
+            </div>
+            <div class="detail">
+                <input class="conceretdetail" type="text" placeholder="备注" value="{{detail}}" onchange="changeDetail"></input>
+            </div>
+            <input class="btn-dui" type="button" value="√" onclick="addEvent"></input>
+        </div>
+    </div>
+</template>
+
+<style>
+    .edit-page{
+        flex-direction: column;
+        background-color:aliceblue;
+    }
+    .edit-page text{
+        font-size: 40px;
+        color: #000000;
+        font-weight: bold;
+        font-family: myfont-bold, serif;
+    }
+    .edit-page .input{
+        flex-direction: column;
+    }
+    .input .name{        
+        margin-left: 25px;
+        margin-top: 25px;
+        flex-direction: column;
+    }
+    .title{
+        width: 280px;
+        padding-left: 20px;
+        background-color: antiquewhite;
+        border-radius: 10px;
+    }
+    .name .titleinput{
+        padding-left: 20px;
+        height: 60px;
+        width: 580px;
+        margin-top: 10px;
+        background-color: rgb(242, 224, 225);
+    }
+    .input .select{        
+        margin-left: 25px;
+        margin-top: 25px;
+        flex-direction: row;
+    }
+    .select .selectinput{
+        margin-left: 10px;
+        width: 100px;
+        font-weight: bold;
+        background-color: rgb(242, 224, 225);
+        border-radius: 10px;
+    }
+    .input .time{        
+        margin-left: 25px;
+        margin-top: 25px;
+        flex-direction: row;
+    }
+    .time .date{
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 180px;
+        font-weight: bold;
+        background-color: rgb(242, 224, 225);
+        border-radius: 10px;
+    }
+    .time .concerettime{
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 100px;
+        font-weight: bold;
+        background-color: rgb(242, 224, 225);
+        border-radius: 10px;
+        padding-left: 10px;       
+    }
+    .Asr{
+        margin-left: 25px;
+        margin-top: 25px;
+        flex-direction: row;
+    }
+    .detail{
+        margin-left: 25px;
+        margin-top: 25px;
+        flex-direction: row;
+    }
+    .detail .conceretdetail{
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding-left: 20px;
+        height: 300px;
+        width: 580px;
+        margin-top: 10px;
+        background-color: rgb(242, 224, 225);
+    }
+    .edit-page .input .asr-image{
+        width: 40px;
+        height: 40px;
+        margin: 30px;
+        border-width: 0px;
+        flex-shrink: 0;
+        background-image: url("/Common/asr.png");
+    }
+    .btn-dui{
+        margin-top: 20px;
+        align-items: center;
+        justify-content: center;
+        background-color: #a4b9f4;
+    }
+</style>
+
+<script>
+import asr from '@service.asr'
+import router from '@system.router'
+import storage from '@system.storage'
+    export default{
+        privated:{
+
+        },
+        protected:{
+            pagename: "添加",
+            titlename:"添加新的事项",
+            name : '',
+            datetime :"",
+            type:"",
+            idx: "",
+            date: '',   
+            time: '',
+            defaulttype:'',
+            detail:''
+        },
+        onInit(){
+            this.$page.setTitleBar({text: this.pagename});
+            this.initTime();
+            this.initAsr();
+            console.log('type'+this.type)
+        },
+        changeName(evt){
+            this.name=evt.value
+        },
+        changeDetail(evt){
+            this.detail = evt.value
+        },
+        selectType(evt){
+            if(this.pagename=='编辑'){
+                this.defaulttype = this.type
+                this.type=evt.newValue
+                console.log('编辑'+'newValue'+this.type)
+            }
+            else{
+                this.type=evt.newValue
+            }
+        },
+        initTime(){
+            if(this.datetime==''){
+                const date = new Date();
+                const Y = date.getFullYear();
+                const M = date.getMonth()+1;
+                const D = date.getDate();
+                const H = date.getHours();
+                const m = date.getMinutes();
+                this.date = Y + '-'+M+'-'+D
+                this.time = H + ':' + m
+                this.datetime = this.date+' '+this.time
+            }
+            else{
+                let list2 = this.datetime.split(' ')
+                this.date = list2[0]
+                this.time = list2[1]
+            }
+        },
+        initAsr(){
+            let that = this
+            asr.oncompleteresult = ({result}) =>{
+                this.name = `${result}`
+            }
+        },
+        nameAsr(){
+            let that = this
+            this.nameBackUp = this.name
+            asr.start({
+                success: function(){
+                    that.name = `${result}`
+                },
+                fail: function(data,code){
+                    that.name = `datetime fail, code=${code}, data=${data}`
+                }
+            })
+        },
+        UpdateDate(evt){
+            this.date = evt.year+'-'+(evt.month+1)+'-'+evt.day
+        },
+        UpdateTime(evt){
+            this.time = evt.hour+':'+evt.minute
+        },
+        show () {
+            this.$element('picker').show()
+        },
+        addEvent(){
+            if(this.name==''){
+                this.$app.$def.makeToast('error:task name must not be null')
+            }
+            else if(this.type==''){
+                this.type=0
+            }       
+            else{
+                let datetime = this.date+' '+this.time
+                let that = this
+                storage.get({
+                    key: 'event',
+                    success: function(data){
+                        console.log('get')
+                        if(data!=''){
+                            let list = JSON.parse(data)
+                            console.log(list)
+                            if(that.defaulttype!=''){
+                                console.log('type==0')
+                                console.log(that.defaulttype)
+                                console.log(that.type)
+                                console.log(that.datetime)
+                                console.log(that.detail)
+                                console.log(list[that.defaulttype].list)
+                                console.log(that.idx)
+                                list[that.defaulttype].list[that.idx].name=that.name
+                                console.log('yep1')
+                                list[that.defaulttype].list[that.idx].datetime=datetime
+                                console.log('yep2')
+                                list[that.defaulttype].list[that.idx].detail=that.detail
+                                console.log('yep3')
+                                
+                                if(that.defaulttype==that.type){
+                                    console.log('no change')
+                                }
+                                else{
+                                    console.log('type==0')
+                                    console.log('no change rt')
+                                    list[that.type].list.push(list[that.defaulttype].list[that.idx])
+                                    list[that.defaulttype].list.splice(that.idx,1) 
+                                }      
+                            }
+                            else{
+                                console.log('no defaulttype')
+                                list[that.type].list.push({name:that.name, datetime:that.date+' '+that.time,detail:that.detail})
+                            }
+                            storage.set({
+                                key:'event',
+                                value:list,
+                                success: function(){
+                                    console.log('success')
+                                    that.name=''
+                                    that.detail=''
+                                    that.pagename='添加'
+                                    that.type=''
+                                    that.datetime=''
+                                    that.defaulttype=''
+                                    router.back()
+                                },
+                                fail: function (data, code) {
+                                    console.log('no')
+                                    that.$app.$def.makeToast(`handling fail, code = ${code}`)
+                                }
+                            })
+                        }
+                        console.log('no data')  
+                    },
+                    fail: function(data,code){
+                        that.$app.$def.makeToast(`handling fail, code = ${code}`)
+                    }
+                })
+            }
+        }
+    }
+
+</script>

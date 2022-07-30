@@ -1,0 +1,78 @@
+{
+  "package": "com.application.demo",
+  "name": "todo",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/Common/logo.png",
+  "deviceTypeList": [
+    "phone"
+  ],
+  "features": [
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.shortcut"
+    },
+    {
+      "name": "service.asr"
+    },
+    {
+      "name": "system.storage"
+    }
+  ],
+  "permissions": [
+    {
+      "origin": "*"
+    }
+  ],
+  "config": {
+    "logLevel": "log"
+  },
+  "router": {
+    "entry": "Demo",
+    "pages": {
+      "Demo": {
+        "component": "index"
+      },
+      "DemoDetail": {
+        "component": "index"
+      },
+      "Edit":{
+        "component":"index"
+      },
+      "SUM":{
+        "component":"index"
+      }
+    },
+    "widgets": {
+      "CardDemo": {
+        "name": "CardDemo",
+        "description": "快应用卡片展示",
+        "component": "index",
+        "path": "/CardDemo",
+        "features": []
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#5e74ae",
+    "titleBarTextColor": "#ffffff",
+    "menu": false,
+    "menuBarData": {
+      "menuBar": false
+    },
+    "pages": {
+      "Demo": {
+        "titleBarText": "TODO"
+      },
+      "DemoDetail": {
+        "titleBarText": "详情页"
+      }
+    }
+  }
+}

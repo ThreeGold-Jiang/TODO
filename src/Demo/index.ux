@@ -1,0 +1,199 @@
+
+<import name="item" src="./item.ux"></import>
+<template>
+  <!--主页面-->
+  <div class="main-page">
+    <div class="title">
+      <input type="text" class="span1" placeholder="写下今日份的箴言" value="{{sentence}}" onchange="setSentence" onenterkeyclick="setSentence(value)">TODO</input>
+    </div>
+    <tabs class="tabs" onchange="changeTab" index="{{activeindex}}" >
+      <tab-bar class="tab-bar" >
+        <text class="{{activeindex==$idx ? 'active':''}}" for="{{listnames}}">{{$item.name}}</text>
+      </tab-bar>
+      <tab-content>
+        <div class="item-container">
+          <list >
+              <list-item for="{{list[activeindex].list}}">
+                  <text></text>
+                  <item item="{{$item}}" idx="{{$idx}}" type="{{activeindex}}"></item>
+                  <!-- <text>{{$item}}</text> -->
+              </list-item>
+          </list>
+        </div>
+      </tab-content>
+    </tabs>
+      <div>
+        <input type="button" value="+" onclick="Addevent(activeindex)"></input>
+        <input type="button" value="SUM" onclick="SUM(list)"></input>
+      </div>
+    </div>
+</template>
+
+<script>
+import router from '@system.router'
+import storage from '@system.storage'
+
+export default {
+  // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
+  private: {
+    title: '示例页面',
+    sentence: '',
+    activeindex: 1,
+    listnames: [{"name":"todo"},{"name":"doing"},{"name":"done"}],
+    list: [{"name":"todo-list","list":[{name:'待办',datetime:"2022-7-26 1:56", detail:"备注"},{name:'待办',datetime:"2022-7-26 1:56", detail:"备注"},{name:'待办',datetime:"2022-7-26 1:56",detail:"备注"}]},
+    {"name":"doing-list","list":[{name:'正在办',datetime:"2022-7-26 1:56", detail:"备注"},{name:'正在办',datetime:"2022-7-26 1:56", detail:"备注"},{name:'正在办',datetime:"2022-7-26 1:56", detail:"备注"}]},
+    {"name":"done-list","list":[{name:'完成',datetime:"2022-7-26 1:56", detail:"备注"},{name:'待办',datetime:"2022-7-26 1:56", detail:"备注"},{name:'待办',datetime:"2022-7-26 1:56", detail:"备注"}]}]
+  },
+  routeDetail () {
+    // 跳转到应用内的某个页面，router用法详见：文档->接口->页面路由
+    router.push ({
+      uri: '/DemoDetail'
+    })
+  },
+  setSentence(e){
+    this.sentence=e.text
+  },
+  changeTab(e){
+    this.activeindex=e.index
+    this.onShow()
+  },
+  onInit(){
+    console.log('hiInit')
+    this.$page.setTitleBar({text: 'TODO'})
+    this.saveList()
+    this.$on('markItem',(evt) => {
+      if(evt.detail.type != 2){
+        this.list[evt.detail.type+1].list.push(this.list[evt.detail.type].list[evt.detail.idx])
+        this.list[evt.detail.type].list.splice(evt.detail.idx,1)
+      }
+      else{
+        this.list[evt.detail.type-1].list.push(this.list[evt.detail.type].list[evt.detail.idx])
+        this.list[evt.detail.type].list.splice(evt.detail.idx,1)
+      }
+      this.saveList()
+    })
+    this.$on('deleteItem',(evt) => {
+      this.list[evt.detail.type].list.splice(evt.detail.idx,1)
+      this.saveList()
+    })
+  },
+  onShow(){
+    console.log('showhihihi')
+    let that = this
+    this.loadList(function(data){
+      if(data!=''){
+        let list = JSON.parse(data)
+        that.list = list
+        console.log('showin')
+      }
+      that.saveList()
+    })
+  },
+  saveList(voidCallback = function(){}){
+    let that = this
+    let list = this.list    
+    console.log('save')
+    console.log(list.length)
+    console.log(list[0])
+    storage.set({
+      key:'event',
+      value: list,
+      success: function(daye){
+        voidCallback(data)
+        console.log('data')
+      },
+      fail: function(data,code){
+        this.$app.$def.makeToast(`storage fail, code = ${code}`)
+      }
+    })
+  },
+  loadList(dataCallback = function(){ }){
+    let that = this
+    storage.get({
+      key:'event',
+      success: function(data){
+        dataCallback(data)       
+      },
+      fail: function(data, code){
+        that.$app.$def.makeToast(`handling fail, code = ${code}`)
+      }
+    })
+  },
+  Addevent(idx){
+    console.log('add'+idx)
+    router.push({
+      uri:'/Edit',
+      params:{
+        type: idx
+      }
+    })
+  },
+  SUM(list){
+    router.push({
+      uri: '/SUM',
+      params:{
+        list:list
+      }
+    })
+  }
+}
+</script>
+
+<style>
+@import "../Common/css/font.css";
+  .main-page {
+    background-color: rgb(243, 250, 249);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .main-page .title {
+    width: 750px;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .main-page .title .span1{
+    font-size: 38px;
+    color: #01306C;
+    font-weight: bold;
+    padding: 45px 0px 0px 100px;
+    font-style:italic;
+  }
+  .title input{
+    caret-color: transparent;
+  }
+  .btn {
+    width: 550px;
+    height: 86px;
+    margin-top: 75px;
+    border-radius: 43px;
+    background-color: #09ba07;
+    font-size: 30px;
+    color: #ffffff;
+  }
+  .tabs{
+    flex: 1;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .tabs .tab-bar{
+    height: 100px;
+    width: 720px;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: #a4b9f4;
+    border: 5px solid rgb(245, 245, 238);
+    border-radius: 20px;
+  }
+  .tabs text {
+    text-align: center;
+    font-size: 35px;
+    font-family: myfont-bold, serif;
+    color: #3c496e;
+  }
+  .tabs .tab-bar .active {
+    color: #ffffff;
+    font-size: 40px;
+    font-family: myfont-bold, serif;
+  }
+</style>
